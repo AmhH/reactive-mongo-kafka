@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Hooks;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
@@ -42,11 +43,14 @@ public class Controller {
 
   @GetMapping("/threads/webflux")
   public Flux<String> getThreadsWebflux() {
+    //instrument the calls to the publishers' methods, wrap the construction of the operator, and capture a stack trace:
+    Hooks.onOperatorDebug();
     return Flux.fromIterable(getThreads());
   }
 
   @GetMapping("/threads/webclient")
   public Flux<String> getThreadsWebClient() {
+    Hooks.onOperatorDebug();
     WebClient.create("http://localhost:8080/index")
         .get()
         .retrieve()
@@ -61,6 +65,7 @@ public class Controller {
 
   @GetMapping("/threads/mongodb")
   public Flux<String> getIndexMongo() {
+    Hooks.onOperatorDebug();
     personRepository.findAll()
         .doOnNext(p -> log.info("Person: {}", p))
         .subscribe();
@@ -69,6 +74,7 @@ public class Controller {
 
   @GetMapping("/threads/reactor-kafka")
   public Flux<String> getIndexKafka() {
+    Hooks.onOperatorDebug();
     Map<String, Object> producerProps = new HashMap<>();
     producerProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
     producerProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, IntegerSerializer.class);
@@ -101,6 +107,7 @@ public class Controller {
 
   @GetMapping("/index")
   public Mono<String> getIndex() {
+    Hooks.onOperatorDebug();
     return Mono.just("Hello world!");
   }
 
