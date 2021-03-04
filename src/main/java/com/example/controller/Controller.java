@@ -1,6 +1,7 @@
-package com.example;
+package com.example.controller;
 
 
+import com.example.repository.PersonRepository;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
